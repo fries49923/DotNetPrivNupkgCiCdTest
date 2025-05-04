@@ -1,0 +1,44 @@
+name: Package
+
+on:
+  workflow_run:
+    workflows: ["Build and Test"]
+    types:
+      - completed
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+
+      - name: Pack .NET project
+        run: dotnet pack --configuration Release
+
+      - name: Publish package to GitHub Packages
+        run: dotnet nuget push **/*.nupkg --source "https://nuget.pkg.github.com/${{ vars.GH_ACCOUNT_NAME }}/index.json" --api-key ${{ secrets.GH_PACK_TOKEN }}
+        # 關於 ${{ vars.GH_ACCOUNT_NAME }} 和 ${{ secrets.GH_PACK_TOKEN }}：
+        #
+        # 1. ${{ vars.GH_ACCOUNT_NAME }} 為 GitHub Repository 所屬帳戶名稱（例如你的使用者名稱）
+        #    需要在 Repository 的「Settings」→「Secrets and variables」→「Variables」中設定此變數
+        #
+        # 2. ${{ secrets.GH_PACK_TOKEN }} 為 GitHub Personal Access Token (PAT)
+        #    需在 Repository 的「Settings」→「Secrets and variables」→「Secrets」中設定此密鑰
+        #    此 Token 用於認證，讓 dotnet 可以將套件推送至 GitHub Packages
+        #
+        #    此 PAT 需至個人帳號的「Settings」→「Developer settings」→「Personal access tokens」中建立
+        #    並需勾選以下權限：
+        #    - write:packages（推送套件）
+        #    - read:packages（讀取套件）
+        #    - repo（如果要推送至私有倉庫才需要此權限）
