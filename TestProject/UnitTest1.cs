@@ -21,7 +21,7 @@ namespace TestProject
         [InlineData(5, 25)]
         [InlineData(2, 4)]
         [InlineData(0, 0)]
-        [InlineData(-2, 0)]
+        [InlineData(-2, 4)]
         public void Square_ReturnsCorrectResult2(int input, int expected)
         {
             // Arrange
