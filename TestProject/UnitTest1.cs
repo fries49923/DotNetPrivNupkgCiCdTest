@@ -33,5 +33,18 @@ namespace TestProject
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Fact]
+        public void Add_ReturnsCorrectResult()
+        {
+            // Arrange
+            var mathHelper = new MathHelper();
+
+            // Act
+            var result = mathHelper.Add(4, 5);
+
+            // Assert
+            Assert.Equal(9, result);
+        }
     }
 }
